@@ -2,13 +2,13 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "tree.h"
 
 #define COLOR_RED "\033[1;31m"
 #define COLOR_RESET "\033[0m"
 
 int lineno;
 
-int yylval;
 int yystopparser = 0;
 
 FILE *yyin;
@@ -37,13 +37,19 @@ int yylex();
 int yyerror(char *);
 %}
 
+%union {
+  int int_val;
+  char *str_val;
+}
+
 %token open_parent close_parent
 
 %token prom
 %token comma
 %token op_sum op_sub op_mult op_div
 %token op_assign
-%token id cte
+%token <str_val> id
+%token <int_val> cte
 
 %%
 A: id op_assign P {
@@ -72,8 +78,14 @@ T: T op_mult F {
   puts(rule[10]);
 };
 F: id {
+  char* id_lex = $1;
+  create_leaf((void*)id_lex);
+
   puts(rule[11]);
 } | cte {
+  int cte_lex = $1;
+  create_leaf(&cte_lex);
+
   puts(rule[12]);
 } | open_parent E close_parent {
   puts(rule[13]);

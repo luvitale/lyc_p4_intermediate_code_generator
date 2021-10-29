@@ -2,10 +2,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "1.tab.h"
+#include "tree.h"
 
 FILE *yyin;
 
-int yylval;
 int lineno = 1;
 
 int yyerror(char *);
@@ -46,7 +46,6 @@ close_parent ")"
   return close_parent;
 }
 
-
 {prom} {
   return prom;
 }
@@ -72,10 +71,13 @@ close_parent ")"
 }
 
 {id} {
+  yylval.str_val = yytext;
   return id;
 }
 
 {cte} {
+  int value = strtol(yytext,(char **)NULL,10);
+  yylval.int_val = value;
   return cte;
 }
 
