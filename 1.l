@@ -21,7 +21,7 @@ uppercase_letter [A-Z]
 lowercase_letter [a-z]
 letter ({uppercase_letter}|{lowercase_letter})
 
-prom (prom|PROM|Prom)
+prom ("prom"|"PROM"|"Prom")
 
 comma ","
 

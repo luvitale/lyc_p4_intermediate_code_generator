@@ -18,7 +18,7 @@ char *yytext;
 
 char* rule[14] = {
   "R0. S -> A",
-  "R1. A -> id := P"
+  "R1. A -> id := P",
   "R2. P -> prom ( L )",
   "R3. L -> L, E",
   "R4. L -> E",
@@ -46,13 +46,38 @@ int yyerror(char *);
 %token id cte
 
 %%
-S: A;
-A: id op_assign P;
-P: prom open_parent L close_parent;
-L: L comma E | E;
-E: E op_sum T | E op_sub T | T;
-T: T op_mult F | T op_div F | F;
-F: id | cte | open_parent E close_parent;
+A: id op_assign P {
+  puts(rule[1]);
+};
+P: prom open_parent L close_parent {
+  puts(rule[2]);
+};
+L: L comma E {
+  puts(rule[3]);
+} | E {
+  puts(rule[4]);
+};
+E: E op_sum T {
+  puts(rule[5]);
+} | E op_sub T {
+  puts(rule[6]);
+} | T {
+  puts(rule[7]);
+};
+T: T op_mult F {
+  puts(rule[8]);
+} | T op_div F {
+  puts(rule[9]);
+} | F {
+  puts(rule[10]);
+};
+F: id {
+  puts(rule[11]);
+} | cte {
+  puts(rule[12]);
+} | open_parent E close_parent {
+  puts(rule[13]);
+};
 %%
 
 int main(int argc,char *argv[]) {
