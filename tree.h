@@ -15,9 +15,10 @@ typedef struct s_tree_node
 
 typedef t_tree_node *t_tree;
 
-t_tree_node *create_leaf(void *lexeme);
-t_tree_node *create_node(void *lexeme, t_tree_node *left_child, t_tree_node *right_child);
-void saveInorderInFile(t_tree *pa, FILE *pIntermedia);
-void postorder(t_tree *pa);
+t_tree_node *create_leaf(char *);
+t_tree_node *create_node(char *, t_tree_node *, t_tree_node *);
+void save_inorder_in_file(t_tree_node *);
+void save_postorder_in_file(t_tree_node *);
+void postorder(t_tree_node *);
 
 #endif // TREE_H_INCLUDED

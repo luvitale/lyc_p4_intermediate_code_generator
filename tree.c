@@ -1,6 +1,11 @@
 #include "tree.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#define FILENAME "tree.icg"
 
-t_tree_node *create_leaf(void *lexeme)
+// create leaf
+t_tree_node *create_leaf(char *lexeme)
 {
   t_tree_node *leaf = (t_tree_node *)malloc(sizeof(t_tree_node));
   if (!leaf)
@@ -15,7 +20,8 @@ t_tree_node *create_leaf(void *lexeme)
   return leaf;
 }
 
-t_tree_node *create_node(void *lexeme, t_tree_node *left_child, t_tree_node *right_child)
+// create node
+t_tree_node *create_node(char *lexeme, t_tree_node *left_child, t_tree_node *right_child)
 {
   t_tree_node *parent = (t_tree_node *)malloc(sizeof(t_tree_node));
 
@@ -32,21 +38,65 @@ t_tree_node *create_node(void *lexeme, t_tree_node *left_child, t_tree_node *rig
   return parent;
 }
 
-void saveInorderInFile(t_tree *ptree, FILE *pf)
+// save inorder
+void save_inorder(t_tree_node *root, FILE *fp)
 {
-  if (!*ptree)
-    return;
-
-  saveInorderInFile(&(*ptree)->left, pf);
-  fwrite(&(*ptree)->info, sizeof(char[50]), 1, pf);
-  saveInorderInFile(&(*ptree)->right, pf);
+  if (root)
+  {
+    save_inorder(root->left, fp);
+    fprintf(fp, "%s ", root->info);
+    save_inorder(root->right, fp);
+  }
 }
 
-void postorder(t_tree *ptree)
+// save inorder in file
+void save_inorder_in_file(t_tree_node *root)
 {
-  if (!(*ptree))
+  FILE *fp;
+  fp = fopen(FILENAME, "w+");
+  if (!fp)
+  {
+    printf("Cannot open file.\n");
     return;
-  postorder(&(*ptree)->left);
-  postorder(&(*ptree)->right);
-  printf("%s  ", (*ptree)->info);
+  }
+
+  save_inorder(root, fp);
+  fclose(fp);
+}
+
+// save postorder
+void save_postorder(t_tree_node *root, FILE *fp)
+{
+  if (root)
+  {
+    save_postorder(root->left, fp);
+    save_postorder(root->right, fp);
+    fprintf(fp, "%s ", root->info);
+  }
+}
+
+// save postorder in file
+void save_postorder_in_file(t_tree_node *root)
+{
+  FILE *fp;
+  fp = fopen(FILENAME, "w+");
+  if (!fp)
+  {
+    printf("Cannot open file.\n");
+    return;
+  }
+
+  save_postorder(root, fp);
+  fclose(fp);
+}
+
+// show postorder
+void postorder(t_tree_node *root)
+{
+  if (root)
+  {
+    postorder(root->left);
+    postorder(root->right);
+    printf("%s ", root->info);
+  }
 }

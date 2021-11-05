@@ -13,7 +13,7 @@ endif
 all: 1.app
 
 %.app: %.yy.c %.tab.c tree.c
-	$(CC) -o $*.$(EXT) $? -fcommon
+	$(CC) -o $*.$(EXT) $? -fcommon -lm
 
 %.yy.c: %.l
 	$(LEX) -o $@ $<

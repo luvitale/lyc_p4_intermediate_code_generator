@@ -33,6 +33,17 @@ char* rule[14] = {
   "R13. F -> ( E )"
 };
 
+// Tree
+t_tree tree;
+t_tree_node* f_ptr;
+t_tree_node* l_ptr;
+t_tree_node* e_ptr;
+t_tree_node* t_ptr;
+t_tree_node* p_ptr;
+t_tree_node* a_ptr;
+
+int counter;
+
 int yylex();
 int yyerror(char *);
 %}
@@ -52,42 +63,78 @@ int yyerror(char *);
 %token <int_val> cte
 
 %%
+S: A {
+  tree = a_ptr;
+};
+
 A: id op_assign P {
+  a_ptr = create_node(":=", create_leaf($1), p_ptr);
+
   puts(rule[1]);
 };
 P: prom open_parent L close_parent {
+  char counter_str[10];
+  sprintf(counter_str, "%d", counter);
+  p_ptr = create_node("/", l_ptr, create_leaf(counter_str));
+
   puts(rule[2]);
 };
 L: L comma E {
+  ++counter;
+  l_ptr = create_node("+", l_ptr, e_ptr);
+
   puts(rule[3]);
 } | E {
+  counter = 1;
+  l_ptr = e_ptr;
+
   puts(rule[4]);
 };
 E: E op_sum T {
+  e_ptr = create_node("+", e_ptr, t_ptr);
+
   puts(rule[5]);
 } | E op_sub T {
+  e_ptr = create_node("-", e_ptr, t_ptr);
+
   puts(rule[6]);
 } | T {
+  e_ptr = t_ptr;
+
   puts(rule[7]);
 };
 T: T op_mult F {
+  t_ptr = create_node("*", t_ptr, f_ptr);
+
   puts(rule[8]);
 } | T op_div F {
+  t_ptr = create_node("/", t_ptr, f_ptr);
+
   puts(rule[9]);
 } | F {
+  t_ptr = f_ptr;
+
   puts(rule[10]);
 };
 F: id {
-  char* id_lex = $1;
-  create_leaf((void*)id_lex);
+  char id_lex[100];
+
+  strcpy(id_lex, $1);
+
+  f_ptr = create_leaf(id_lex);
 
   puts(rule[11]);
 } | cte {
-  int cte_lex = $1;
-  create_leaf(&cte_lex);
+  char cte_lex[10];
+
+  sprintf(cte_lex, "%d", $1);
+
+  f_ptr = create_leaf(cte_lex);
 
   puts(rule[12]);
 } | open_parent E close_parent {
+  f_ptr = e_ptr;
+
   puts(rule[13]);
 };
 %%
@@ -105,6 +152,8 @@ int main(int argc,char *argv[]) {
   }
 
   yyparse();
+
+  save_postorder_in_file(a_ptr);
 
   fclose(yyin);
 
