@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "tree.h"
+#include "rpn.h"
 
 #define COLOR_RED "\033[1;31m"
 #define COLOR_RESET "\033[0m"
@@ -42,6 +43,9 @@ t_tree_node* t_ptr;
 t_tree_node* p_ptr;
 t_tree_node* a_ptr;
 
+// RPN
+rpn_t *rpn;
+
 int counter;
 
 int yylex();
@@ -68,20 +72,36 @@ S: A {
 };
 
 A: id op_assign P {
+  // tree
   a_ptr = create_node(":=", create_leaf($1), p_ptr);
+
+  // rpn
+  add_lexeme_to_rpn(rpn, $1);
+  add_lexeme_to_rpn(rpn, ":=");
 
   puts(rule[1]);
 };
 P: prom open_parent L close_parent {
   char counter_str[10];
   sprintf(counter_str, "%d", counter);
+
+  // tree
   p_ptr = create_node("/", l_ptr, create_leaf(counter_str));
+
+  // rpn
+  add_lexeme_to_rpn(rpn, strdup(counter_str));
+  add_lexeme_to_rpn(rpn, "/");
 
   puts(rule[2]);
 };
 L: L comma E {
   ++counter;
+
+  // tree
   l_ptr = create_node("+", l_ptr, e_ptr);
+
+  // rpn
+  add_lexeme_to_rpn(rpn, "+");
 
   puts(rule[3]);
 } | E {
@@ -91,11 +111,19 @@ L: L comma E {
   puts(rule[4]);
 };
 E: E op_sum T {
+  // tree
   e_ptr = create_node("+", e_ptr, t_ptr);
+
+  // rpn
+  add_lexeme_to_rpn(rpn, "+");
 
   puts(rule[5]);
 } | E op_sub T {
+  // tree
   e_ptr = create_node("-", e_ptr, t_ptr);
+
+  // rpn
+  add_lexeme_to_rpn(rpn, "-");
 
   puts(rule[6]);
 } | T {
@@ -104,11 +132,19 @@ E: E op_sum T {
   puts(rule[7]);
 };
 T: T op_mult F {
+  // tree
   t_ptr = create_node("*", t_ptr, f_ptr);
+
+  // rpn
+  add_lexeme_to_rpn(rpn, "*");
 
   puts(rule[8]);
 } | T op_div F {
+  // tree
   t_ptr = create_node("/", t_ptr, f_ptr);
+
+  // rpn
+  add_lexeme_to_rpn(rpn, "/");
 
   puts(rule[9]);
 } | F {
@@ -121,7 +157,11 @@ F: id {
 
   strcpy(id_lex, $1);
 
+  // tree
   f_ptr = create_leaf(id_lex);
+
+  // rpn
+  add_lexeme_to_rpn(rpn, strdup(id_lex));
 
   puts(rule[11]);
 } | cte {
@@ -129,7 +169,11 @@ F: id {
 
   sprintf(cte_lex, "%d", $1);
 
+  // tree
   f_ptr = create_leaf(cte_lex);
+
+  // rpn
+  add_lexeme_to_rpn(rpn, strdup(cte_lex));
 
   puts(rule[12]);
 } | open_parent E close_parent {
@@ -151,9 +195,12 @@ int main(int argc,char *argv[]) {
     yyin = arg_file;
   }
 
+  rpn = create_rpn();
+
   yyparse();
 
   save_postorder_in_file(a_ptr);
+  save_rpn_in_file(rpn);
 
   fclose(yyin);
 
