@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include "tree.h"
 #include "rpn.h"
+#include "tac.h"
 
 #define COLOR_RED "\033[1;31m"
 #define COLOR_RESET "\033[0m"
@@ -46,6 +47,14 @@ t_tree_node* a_ptr;
 // RPN
 rpn_t *rpn;
 
+// TAC
+tac_t* f_ind;
+tac_t* l_ind;
+tac_t* e_ind;
+tac_t* t_ind;
+tac_t* p_ind;
+tac_t* a_ind;
+
 int counter;
 
 int yylex();
@@ -79,6 +88,9 @@ A: id op_assign P {
   add_lexeme_to_rpn(rpn, $1);
   add_lexeme_to_rpn(rpn, ":=");
 
+  // tac
+  a_ind = create_tac(":=", create_tac($1, NULL, NULL), p_ind);
+
   puts(rule[1]);
 };
 P: prom open_parent L close_parent {
@@ -92,6 +104,9 @@ P: prom open_parent L close_parent {
   add_lexeme_to_rpn(rpn, strdup(counter_str));
   add_lexeme_to_rpn(rpn, "/");
 
+  // tac
+  p_ind = create_tac("/", l_ind, create_tac(counter_str, NULL, NULL));
+
   puts(rule[2]);
 };
 L: L comma E {
@@ -103,10 +118,16 @@ L: L comma E {
   // rpn
   add_lexeme_to_rpn(rpn, "+");
 
+  // tac
+  l_ind = create_tac("+", l_ind, e_ind);
+
   puts(rule[3]);
 } | E {
   counter = 1;
+
   l_ptr = e_ptr;
+
+  l_ind = e_ind;
 
   puts(rule[4]);
 };
@@ -117,6 +138,9 @@ E: E op_sum T {
   // rpn
   add_lexeme_to_rpn(rpn, "+");
 
+  // tac
+  e_ind = create_tac("+", e_ind, t_ind);
+
   puts(rule[5]);
 } | E op_sub T {
   // tree
@@ -125,9 +149,14 @@ E: E op_sum T {
   // rpn
   add_lexeme_to_rpn(rpn, "-");
 
+  // tac
+  e_ind = create_tac("-", e_ind, t_ind);
+
   puts(rule[6]);
 } | T {
   e_ptr = t_ptr;
+
+  e_ind = t_ind;
 
   puts(rule[7]);
 };
@@ -138,6 +167,9 @@ T: T op_mult F {
   // rpn
   add_lexeme_to_rpn(rpn, "*");
 
+  // tac
+  t_ind = create_tac("*", t_ind, f_ind);
+
   puts(rule[8]);
 } | T op_div F {
   // tree
@@ -146,9 +178,14 @@ T: T op_mult F {
   // rpn
   add_lexeme_to_rpn(rpn, "/");
 
+  // tac
+  t_ind = create_tac("/", t_ind, f_ind);
+
   puts(rule[9]);
 } | F {
   t_ptr = f_ptr;
+
+  t_ind = f_ind;
 
   puts(rule[10]);
 };
@@ -163,6 +200,9 @@ F: id {
   // rpn
   add_lexeme_to_rpn(rpn, strdup(id_lex));
 
+  // tac
+  f_ind = create_tac(strdup(id_lex), NULL, NULL);
+
   puts(rule[11]);
 } | cte {
   char cte_lex[10];
@@ -174,6 +214,9 @@ F: id {
 
   // rpn
   add_lexeme_to_rpn(rpn, strdup(cte_lex));
+
+  // tac
+  f_ind = create_tac(strdup(cte_lex), NULL, NULL);
 
   puts(rule[12]);
 } | open_parent E close_parent {
@@ -196,6 +239,7 @@ int main(int argc,char *argv[]) {
   }
 
   rpn = create_rpn();
+  initialize_tac();
 
   yyparse();
 
