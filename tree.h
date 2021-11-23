@@ -17,8 +17,8 @@ typedef t_tree_node *t_tree;
 
 t_tree_node *create_leaf(char *);
 t_tree_node *create_node(char *, t_tree_node *, t_tree_node *);
-void save_inorder_in_file(t_tree_node *);
-void save_postorder_in_file(t_tree_node *);
+void save_inorder_in_file(t_tree_node *, char *);
+void save_postorder_in_file(t_tree_node *, char *);
 void postorder(t_tree_node *);
 
 #endif // TREE_H_INCLUDED

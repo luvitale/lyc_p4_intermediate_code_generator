@@ -17,7 +17,7 @@ char *get_lexeme_from_rpn(rpn_t *, int);
 int get_size_of_rpn(rpn_t *);
 int get_last_cell_of_rpn(rpn_t *);
 void free_rpn(rpn_t *);
-void save_rpn_in_file(rpn_t *);
+void save_rpn_in_file(rpn_t *, char *);
 void show_rpn(rpn_t *);
 
 #endif // RPN_H

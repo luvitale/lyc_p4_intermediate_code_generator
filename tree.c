@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#define FILENAME "tree.icg"
+#define EXTENSION "tree.icg"
 
 // create leaf
 t_tree_node *create_leaf(char *lexeme)
@@ -50,10 +50,12 @@ void save_inorder(t_tree_node *root, FILE *fp)
 }
 
 // save inorder in file
-void save_inorder_in_file(t_tree_node *root)
+void save_inorder_in_file(t_tree_node *root, char *filename)
 {
   FILE *fp;
-  fp = fopen(FILENAME, "w+");
+  char file[100];
+  sprintf(file, "%s.%s", filename, EXTENSION);
+  fp = fopen(file, "w+");
   if (!fp)
   {
     printf("Cannot open file.\n");
@@ -76,10 +78,12 @@ void save_postorder(t_tree_node *root, FILE *fp)
 }
 
 // save postorder in file
-void save_postorder_in_file(t_tree_node *root)
+void save_postorder_in_file(t_tree_node *root, char *filename)
 {
   FILE *fp;
-  fp = fopen(FILENAME, "w+");
+  char file[100];
+  sprintf(file, "%s.%s", filename, EXTENSION);
+  fp = fopen(file, "w+");
   if (!fp)
   {
     printf("Cannot open file.\n");

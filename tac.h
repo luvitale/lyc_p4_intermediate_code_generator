@@ -9,7 +9,7 @@ typedef struct TAC
   struct TAC *op1, *op2;
 } tac_t;
 
-tac_t *create_tac(char *lex, tac_t *op1, tac_t *op2);
-void initialize_tac();
+tac_t *create_tac(char *, tac_t *, tac_t *);
+void initialize_tac(char *);
 
 #endif // TAC_H

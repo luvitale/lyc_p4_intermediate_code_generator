@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #define INITIAL_CAPACITY 100
-#define FILENAME "rpn.icg"
+#define EXTENSION "rpn.icg"
 
 // create RPN
 rpn_t *create_rpn()
@@ -66,14 +66,17 @@ void free_rpn(rpn_t *rpn)
 }
 
 // save RPN in file
-void save_rpn_in_file(rpn_t *rpn)
+void save_rpn_in_file(rpn_t *rpn, char *filename)
 {
-  FILE *file = fopen(FILENAME, "w");
+  FILE *fp;
+  char file[100];
+  sprintf(file, "%s.%s", filename, EXTENSION);
+  fp = fopen(file, "w");
   for (int i = 0; i < rpn->size; i++)
   {
-    fprintf(file, "%s\n", rpn->lexeme[i]);
+    fprintf(fp, "%s\n", rpn->lexeme[i]);
   }
-  fclose(file);
+  fclose(fp);
 }
 
 // show RPN
